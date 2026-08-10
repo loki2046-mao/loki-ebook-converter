@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loki MD</title>
+  <style>
+    :root {
+      --bg: #faf9f7;
+      --card: #ffffff;
+      --border: #e8e4df;
+      --text: #2c2c2c;
+      --sub: #999;
+      --accent: #e67e3a;
+      --accent-hover: #d47030;
+      --green: #5a9e6f;
+      --red: #c85552;
+      --radius: 12px;
+      --font: -apple-system, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-app-region: drag;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Titlebar */
+    .titlebar {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px 0 76px;
+      font-size: 12px;
+      color: var(--sub);
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 32px 32px;
+      -webkit-app-region: no-drag;
+      overflow-y: auto;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      width: 100%;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 20px;
+      background: var(--card);
+    }
+    .drop-zone.drag-over { border-color: var(--accent); background: #fef9f5; }
+    .drop-zone p { font-size: 14px; color: var(--sub); margin: 8px 0 4px; }
+    .drop-zone .plus { font-size: 32px; color: var(--accent); line-height: 1; }
+
+    /* File list */
+    .file-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .file-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    .file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-remove { color: var(--sub); cursor: pointer; padding: 2px 6px; font-size: 16px; opacity: 0.5; }
+    .file-remove:hover { opacity: 1; color: var(--red); }
+
+    /* Format selector */
+    .format-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .format-row label { font-size: 13px; color: var(--sub); white-space: nowrap; }
+    .format-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .format-tag {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      cursor: pointer;
+      background: var(--card);
+      transition: all 0.15s;
+    }
+    .format-tag:hover { border-color: var(--accent); }
+    .format-tag.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 15px;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); margin-top: 8px; }
+
+    /* Progress */
+    .progress-wrap {
+      width: 100%;
+      margin-bottom: 16px;
+      display: none;
+      padding: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .progress-wrap.show { display: block; }
+    .progress-header, .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-header { margin-bottom: 10px; }
+    .progress-label { font-size: 13px; font-weight: 600; }
+    .progress-count, .progress-percent { font-size: 12px; color: var(--accent); font-weight: 600; white-space: nowrap; }
+    .current-file {
+      font-size: 12px;
+      color: var(--sub);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 10px;
+    }
+    .progress-meta { margin: 12px 0 6px; }
+    .progress-meta span:first-child { font-size: 12px; color: var(--sub); }
+    .progress-bar {
+      height: 8px;
+      background: #eeeae5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar.current { height: 10px; }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .overall-fill { background: var(--green); }
+    .progress-text { display: none; }
+
+    /* Result */
+    .result {
+      width: 100%;
+      margin-top: 12px;
+      display: none;
+    }
+    .result.show { display: block; }
+    .result-item {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-item.ok { background: #f0f7f2; border: 1px solid #c8e6cf; }
+    .result-item.err { background: #fdf2f2; border: 1px solid #f5cece; }
+    .result-item .icon { font-size: 16px; flex-shrink: 0; }
+    .result-item .result-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .result-item .finder-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--accent);
+      cursor: pointer;
+      white-space: nowrap;
+      border: 1px solid var(--accent);
+      background: transparent;
+      transition: all 0.15s;
+      font-family: var(--font);
+    }
+    .result-item .finder-btn:hover { background: var(--accent); color: #fff; }
+
+    /* Calibre missing */
+    .missing-banner {
+      width: 100%;
+      background: #fff8e7;
+      border: 1px solid #f0d88a;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .missing-banner.show { display: block; }
+    .missing-banner .install-link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+    .empty-hint { text-align: center; color: var(--sub); font-size: 13px; margin-top: 24px; line-height: 1.8; }
+
+    /* Output dir selector */
+    .output-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .output-row label { font-size: 13px; color: var(--sub); white-space: nowrap; }
+    .output-path {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .output-path-btn {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--card);
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .output-path-btn:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="titlebar">Loki MD</div>
+
+<div class="main">
+  <!-- Calibre missing -->
+  <div class="missing-banner" id="missing-banner">
+    未检测到 Calibre 转换引擎。<br />
+    点击<a class="install-link" id="install-btn">一键安装</a>，或手动安装后重启软件。<br />
+    <span style="color:var(--sub);font-size:12px;">（需要 Homebrew，macOS 通常已自带）</span>
+  </div>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="drop-zone">
+    <div class="plus">+</div>
+    <p>拖拽电子书文件到这里</p>
+    <p style="font-size:12px;color:#bbb;">支持 epub · mobi · pdf · azw3 · docx · txt 等</p>
+  </div>
+
+  <!-- File list -->
+  <div class="file-list" id="file-list"></div>
+
+  <!-- Format picker -->
+  <div class="format-row" id="format-row" style="display:none;">
+    <label>转为</label>
+    <div class="format-tags" id="format-tags"></div>
+  </div>
+
+  <!-- Output dir -->
+  <div class="output-row" id="output-row" style="display:none;">
+    <label>输出到</label>
+    <span class="output-path" id="output-path">与源文件相同</span>
+    <button class="output-path-btn" id="output-path-btn">更改…</button>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-label" id="progress-status">准备转换</span>
+      <span class="progress-count" id="progress-count"></span>
+    </div>
+    <div class="current-file" id="current-file"></div>
+    <div class="progress-bar"><div class="progress-fill overall-fill" id="progress-overall-fill"></div></div>
+    <div class="progress-meta">
+      <span>当前文件</span>
+      <span class="progress-percent" id="progress-percent">0%</span>
+    </div>
+    <div class="progress-bar current"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-text" id="progress-text"></div>
+  </div>
+
+  <!-- Convert button -->
+  <button class="btn btn-primary" id="convert-btn" disabled>开始转换</button>
+
+  <!-- Results -->
+  <div class="result" id="result"></div>
+
+  <div class="empty-hint" id="empty-hint">
+    支持 epub、mobi、pdf、azw3、docx、txt、rtf 等格式互转<br />
+    可以一次拖入多个文件批量转换
+  </div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let files = [];
+  let targetFormat = null;
+  let outputDir = null;
+
+  // --- Init ---
+  async function init() {
+    const calibre = await window.api.detectCalibre();
+    if (!calibre.found) {
+      $('missing-banner').classList.add('show');
+      $('convert-btn').disabled = true;
+    } else {
+      $('missing-banner').classList.remove('show');
+    }
+
+    $('install-btn').addEventListener('click', async () => {
+      $('install-btn').textContent = '正在安装…';
+      const result = await window.api.installCalibre();
+      if (result.fallback) {
+        $('install-btn').textContent = '已打开下载页面，安装后重启软件';
+      } else if (result.success) {
+        location.reload();
+      } else {
+        $('install-btn').textContent = '安装失败，请手动安装';
+      }
+    });
+  }
+
+  // --- File selection ---
+  $('drop-zone').addEventListener('click', async () => {
+    const selected = await window.api.selectFiles();
+    if (selected.length > 0) addFiles(selected);
+  });
+
+  $('drop-zone').addEventListener('dragover', (e) => { e.preventDefault(); $('drop-zone').classList.add('drag-over'); });
+  $('drop-zone').addEventListener('dragleave', () => { $('drop-zone').classList.remove('drag-over'); });
+  $('drop-zone').addEventListener('drop', (e) => {
+    e.preventDefault();
+    $('drop-zone').classList.remove('drag-over');
+    const dropped = Array.from(e.dataTransfer.files).map(f => f.path).filter(Boolean);
+    if (dropped.length > 0) addFiles(dropped);
+  });
+
+  async function addFiles(newFiles) {
+    files = [...files, ...newFiles];
+    renderFileList();
+    updateConvertButton();
+
+    if (files.length > 0) {
+      const formats = await window.api.getFormats(files[0]);
+      renderFormatTags(formats);
+      $('format-row').style.display = 'flex';
+      $('output-row').style.display = 'flex';
+      $('empty-hint').style.display = 'none';
+      $('drop-zone').style.padding = '24px 16px';
+      $('drop-zone').querySelector('.plus').textContent = '＋ 添加更多';
+      $('drop-zone').querySelector('p').textContent = '';
+    }
+  }
+
+  function renderFileList() {
+    $('file-list').innerHTML = files.map((f, i) => `
+      <div class="file-item">
+        <span class="file-name">${f.split('/').pop()}</span>
+        <span class="file-remove" data-idx="${i}">×</span>
+      </div>
+    `).join('');
+
+    document.querySelectorAll('.file-remove').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.idx);
+        files.splice(idx, 1);
+        renderFileList();
+        updateConvertButton();
+        if (files.length === 0) resetUI();
+      });
+    });
+  }
+
+  function renderFormatTags(formats) {
+    $('format-tags').innerHTML = formats.map(f => `
+      <span class="format-tag" data-fmt="${f}">.${f}</span>
+    `).join('');
+
+    document.querySelectorAll('.format-tag').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.format-tag').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        targetFormat = el.dataset.fmt;
+        updateConvertButton();
+      });
+    });
+
+    // Default select first
+    if (formats.length > 0) {
+      targetFormat = formats[0];
+      document.querySelector('.format-tag').classList.add('active');
+      updateConvertButton();
+    }
+  }
+
+  function resetUI() {
+    $('format-row').style.display = 'none';
+    $('format-tags').innerHTML = '';
+    $('output-row').style.display = 'none';
+    $('empty-hint').style.display = 'block';
+    $('drop-zone').style.padding = '48px 16px';
+    $('drop-zone').querySelector('.plus').textContent = '+';
+    $('drop-zone').querySelector('p').textContent = '拖拽电子书文件到这里';
+    targetFormat = null;
+    outputDir = null;
+    $('output-path').textContent = '与源文件相同';
+  }
+
+  function updateConvertButton() {
+    $('convert-btn').disabled = files.length === 0 || !targetFormat;
+  }
+
+  // --- Progress ---
+  let batchState = { current: 1, total: 1 };
+
+  function setProgress(percent) {
+    const pct = Math.max(0, Math.min(100, percent));
+    $('progress-fill').style.width = pct + '%';
+    $('progress-percent').textContent = Math.round(pct) + '%';
+    const overall = ((batchState.current - 1) + pct / 100) / batchState.total * 100;
+    $('progress-overall-fill').style.width = Math.max(0, Math.min(100, overall)) + '%';
+  }
+
+  function startProgress(total) {
+    batchState = { current: 1, total };
+    $('progress-wrap').classList.add('show');
+    $('progress-status').textContent = total > 1 ? '批量转换中' : '正在转换';
+    $('progress-count').textContent = total > 1 ? `1 / ${total}` : '';
+    $('current-file').textContent = files[0] ? files[0].split('/').pop() : '';
+    $('current-file').title = $('current-file').textContent;
+    setProgress(0);
+  }
+
+  window.api.onProgress((pct) => {
+    $('progress-wrap').classList.add('show');
+    setProgress(pct);
+  });
+
+  window.api.onBatchProgress((data) => {
+    batchState = { current: data.current, total: data.total };
+    $('progress-wrap').classList.add('show');
+    $('progress-status').textContent = '批量转换中';
+    $('progress-count').textContent = `${data.current} / ${data.total}`;
+    $('current-file').textContent = data.file;
+    $('current-file').title = data.file;
+    setProgress(0);
+  });
+
+  window.api.onBatchResult((result) => {
+    appendResult(result);
+    batchState = { current: result.current, total: result.total };
+    $('progress-overall-fill').style.width = (result.current / result.total * 100) + '%';
+  });
+
+  // --- Convert ---
+  // --- Output dir ---
+  $('output-path-btn').addEventListener('click', async () => {
+    const dir = await window.api.selectOutputDir();
+    if (dir) {
+      outputDir = dir;
+      $('output-path').textContent = dir;
+    }
+  });
+
+  // --- Convert ---
+  $('convert-btn').addEventListener('click', async () => {
+    if (files.length === 0 || !targetFormat) return;
+
+    $('convert-btn').disabled = true;
+    $('convert-btn').textContent = '转换中…';
+    startProgress(files.length);
+    $('result').classList.remove('show');
+    $('result').innerHTML = '';
+
+    if (files.length === 1) {
+      const res = await window.api.convertSingle({ sourcePath: files[0], targetFormat, outputDir });
+      if (res.error) {
+        $('progress-status').textContent = '转换失败';
+        $('current-file').textContent = res.error;
+      } else {
+        setProgress(100);
+        $('progress-status').textContent = '转换完成';
+        showResult([{ status: 'ok', outputPath: res.outputPath, format: targetFormat }]);
+      }
+    } else {
+      const results = await window.api.convertBatch({ files, targetFormat, outputDir });
+      batchState = { current: files.length, total: files.length };
+      setProgress(100);
+      $('progress-status').textContent = '批量转换完成';
+      $('progress-count').textContent = `${files.length} / ${files.length}`;
+      showResult(results.map(r => ({
+        status: r.status,
+        outputPath: r.outputPath,
+        format: targetFormat,
+        file: r.file,
+        error: r.error,
+      })));
+    }
+
+    $('convert-btn').disabled = false;
+    $('convert-btn').textContent = '开始转换';
+  });
+
+  function resultMarkup(r) {
+    if (r.status === 'ok') {
+      return `<div class="result-item ok">
+        <span class="icon">✓</span>
+        <span class="result-name">${r.outputPath.split('/').pop()}</span>
+        <button class="finder-btn" data-path="${r.outputPath}">📂 在 Finder 中显示</button>
+      </div>`;
+    }
+    return `<div class="result-item err">
+      <span class="icon">✗</span>
+      <span class="result-name">${r.file ? r.file.split('/').pop() : '未知文件'} — ${r.error}</span>
+    </div>`;
+  }
+
+  function bindFinderButtons() {
+    document.querySelectorAll('.result-item .finder-btn').forEach(el => {
+      if (el.dataset.bound) return;
+      el.dataset.bound = 'true';
+      el.addEventListener('click', () => {
+        window.api.revealInFinder(el.dataset.path);
+      });
+    });
+  }
+
+  function appendResult(result) {
+    $('result').classList.add('show');
+    $('result').insertAdjacentHTML('beforeend', resultMarkup(result));
+    bindFinderButtons();
+  }
+
+  function showResult(results) {
+    $('result').classList.add('show');
+    $('result').innerHTML = results.map(resultMarkup).join('');
+    bindFinderButtons();
+  }
+
+  init();
+</script>
+
+</body>
+</html>
