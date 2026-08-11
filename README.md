@@ -8,7 +8,7 @@
 
 | 电脑系统 | 下载版本 | 安装包 |
 | --- | --- | --- |
-| macOS，Apple Silicon / Intel | [v1.0.0](https://github.com/loki2046-mao/loki-ebook-converter/releases/tag/v1.0.0) | `Loki-Ebook-Converter-1.0.0-universal.dmg` |
+| macOS，Apple Silicon / Intel | [v1.1.2](https://github.com/loki2046-mao/loki-ebook-converter/releases/tag/v1.1.2) | `Loki电子书转换器-1.1.2-universal.dmg` |
 | Windows 10 1809+ / Windows 11，x64 | [v1.1.1](https://github.com/loki2046-mao/loki-ebook-converter/releases/tag/v1.1.1) | `Loki.Setup.1.1.1.exe` |
 
 Mac 和 Windows 安装包不能混用。普通使用只需要下载对应系统的安装包，不需要下载源码 ZIP。
@@ -21,10 +21,10 @@ Mac 和 Windows 安装包不能混用。普通使用只需要下载对应系统�
 
 ### macOS
 
-Mac 版本发布在 `v1.0.0` Release 中，文件名为：
+Mac 版本发布在 `v1.1.2` Release 中，文件名为：
 
 ```text
-Loki-Ebook-Converter-1.0.0-universal.dmg
+Loki电子书转换器-1.1.2-universal.dmg
 ```
 
 这个 DMG 同时支持 Apple Silicon 芯片和 Intel 芯片。
@@ -47,7 +47,7 @@ Mac 版本已经内置 Calibre 转换运行时：
 
 ### Windows
 
-Windows 版本发布在最新 Release `v1.1.1` 中，文件名为：
+Windows 版本发布在 `v1.1.1` Release 中，文件名为：
 
 ```text
 Loki.Setup.1.1.1.exe

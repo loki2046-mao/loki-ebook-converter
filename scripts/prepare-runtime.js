@@ -31,6 +31,9 @@ if (!fs.existsSync(source)) {
 fs.mkdirSync(path.dirname(destination), { recursive: true });
 fs.cpSync(source, destination, {
   recursive: true,
+  // Preserve Calibre's relative links. Resolving them creates machine-specific
+  // /Applications paths and prevents reliable universal-app packaging.
+  verbatimSymlinks: true,
   filter: (current) => current !== path.join(source, 'Contents', 'Info.plist'),
 });
 

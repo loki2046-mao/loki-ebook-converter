@@ -369,16 +369,63 @@
     if (selected.length > 0) addFiles(selected);
   });
 
-  $('drop-zone').addEventListener('dragover', (e) => { e.preventDefault(); $('drop-zone').classList.add('drag-over'); });
-  $('drop-zone').addEventListener('dragleave', () => { $('drop-zone').classList.remove('drag-over'); });
-  $('drop-zone').addEventListener('drop', (e) => {
-    e.preventDefault();
-    $('drop-zone').classList.remove('drag-over');
-    const dropped = Array.from(e.dataTransfer.files)
-      .map(file => window.api.getPathForFile(file))
+  // Accept files anywhere in the content window. Finder's drag payload does not
+  // consistently advertise the browser-standard "Files" type in Electron, so
+  // always handle the event first and inspect both files and DataTransferItems.
+  let dragDepth = 0;
+
+  function setDropState(active) {
+    $('drop-zone').classList.toggle('drag-over', active);
+  }
+
+  function pathForDroppedFile(file) {
+    try {
+      return window.api.getPathForFile(file) || file.path || '';
+    } catch {
+      return file.path || '';
+    }
+  }
+
+  function getDroppedPaths(event) {
+    const files = Array.from(event.dataTransfer?.files || []);
+    const itemFiles = Array.from(event.dataTransfer?.items || [])
+      .filter(item => item.kind === 'file')
+      .map(item => item.getAsFile())
       .filter(Boolean);
+    return [...files, ...itemFiles]
+      .map(pathForDroppedFile)
+      .filter((filePath, index, paths) => filePath && paths.indexOf(filePath) === index);
+  }
+
+  window.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepth += 1;
+    setDropState(true);
+  }, true);
+
+  window.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'copy';
+    setDropState(true);
+  }, true);
+
+  window.addEventListener('dragleave', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) setDropState(false);
+  }, true);
+
+  window.addEventListener('drop', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepth = 0;
+    setDropState(false);
+    const dropped = getDroppedPaths(event);
     if (dropped.length > 0) addFiles(dropped);
-  });
+  }, true);
 
   async function addFiles(newFiles) {
     files = [...files, ...newFiles];

@@ -1,7 +1,7 @@
 {
   "name": "loki-ebook-converter",
-  "version": "1.1.1",
-  "description": "A clean macOS ebook format converter powered by Calibre", 
+  "version": "1.1.2",
+  "description": "A clean macOS ebook format converter powered by Calibre",
   "author": "Loki",
   "license": "MIT",
   "repository": {
