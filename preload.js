@@ -1,9 +1,10 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
   detectCalibre: () => ipcRenderer.invoke('detect-calibre'),
   getFormats: (path) => ipcRenderer.invoke('get-formats', path),
   selectFiles: () => ipcRenderer.invoke('select-files'),
+  getPathForFile: (file) => webUtils.getPathForFile(file),
   selectOutputDir: () => ipcRenderer.invoke('select-output-dir'),
   convertSingle: (opts) => ipcRenderer.invoke('convert-single', opts),
   convertBatch: (opts) => ipcRenderer.invoke('convert-batch', opts),

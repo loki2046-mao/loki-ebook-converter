@@ -38,17 +38,17 @@ Mac 版本已经内置 Calibre 转换运行时：
 
 ### Windows
 
-Windows 版本发布在 `v1.1.0` Release 中，文件名为：
+Windows 版本发布在最新 Release `v1.1.1` 中，文件名为：
 
 ```text
-Loki.Setup.1.1.0.exe
+Loki.Setup.1.1.1.exe
 ```
 
 当前提供 x64 安装包，支持 Windows 10 1809 及更新版本，以及 Windows 11。
 
 安装步骤：
 
-1. 下载并双击运行 `Loki.Setup.1.1.0.exe`。
+1. 下载并双击运行 `Loki.Setup.1.1.1.exe`。
 2. 如果 Windows SmartScreen 提示“Windows 已保护你的电脑”，点击“更多信息”，确认应用名称后点击“仍要运行”。当前安装包尚未进行代码签名，因此可能出现这个提示。
 3. 按安装向导选择安装位置并完成安装。安装过程中可能会请求管理员权限，这是因为 Calibre 需要作为转换引擎安装到系统中。
 4. 如果电脑尚未安装 Calibre，安装器会自动运行随包附带的官方 Calibre 安装程序。按照 Calibre 安装向导完成安装即可。
@@ -109,7 +109,7 @@ Loki电子书转换器本身提供界面和批量转换流程，实际的电子�
 在 Windows 上，可以把下面的文字交给 Agent：
 
 ```text
-打开 GitHub 仓库 loki2046-mao/loki-ebook-converter 的 Releases 页面，下载 v1.1.0 中的 Loki.Setup.1.1.0.exe 并运行安装器。按向导完成安装；如果 Windows SmartScreen 拦截，点击“更多信息”后选择“仍要运行”。安装器会在需要时自动安装 Calibre 转换引擎。
+打开 GitHub 仓库 loki2046-mao/loki-ebook-converter 的 Releases 页面，下载 v1.1.1 中的 Loki.Setup.1.1.1.exe 并运行安装器。按向导完成安装；如果 Windows SmartScreen 拦截，点击“更多信息”后选择“仍要运行”。安装器会在需要时自动安装 Calibre 转换引擎。
 ```
 
 ## 开发者说明
