@@ -4,11 +4,20 @@
 
 支持常见的 `epub`、`mobi`、`azw3`、`pdf`、`docx`、`txt` 等格式互转。
 
+## 按系统下载
+
+| 电脑系统 | 下载版本 | 安装包 |
+| --- | --- | --- |
+| macOS，Apple Silicon / Intel | [v1.0.0](https://github.com/loki2046-mao/loki-ebook-converter/releases/tag/v1.0.0) | `Loki-Ebook-Converter-1.0.0-universal.dmg` |
+| Windows 10 1809+ / Windows 11，x64 | [v1.1.1](https://github.com/loki2046-mao/loki-ebook-converter/releases/tag/v1.1.1) | `Loki.Setup.1.1.1.exe` |
+
+Mac 和 Windows 安装包不能混用。普通使用只需要下载对应系统的安装包，不需要下载源码 ZIP。
+
 ## 普通用户下载安装
 
 不要使用 GitHub 页面上的 `Code > Download ZIP`。源码压缩包不能直接运行。
 
-请打开仓库的 [Releases](https://github.com/loki2046-mao/loki-ebook-converter/releases) 页面，根据你的电脑系统下载对应的安装包。
+请打开仓库的 [Releases](https://github.com/loki2046-mao/loki-ebook-converter/releases) 页面，按照上面的系统表下载对应的安装包。
 
 ### macOS
 
