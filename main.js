@@ -103,7 +103,7 @@ function convertFile(sourcePath, targetFormat, outputDir, mainWindow) {
     const args = process.platform === 'darwin'
       ? ['--pipe-worker', pythonCode]
       : [sourcePath, outputPath];
-    const proc = spawn(worker, args);
+    const proc = spawn(worker, args, process.platform === 'win32' ? { windowsHide: true } : undefined);
 
     let stderr = '';
     const onOutput = (data) => {

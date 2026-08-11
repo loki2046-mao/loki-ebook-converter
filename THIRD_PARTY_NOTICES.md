@@ -2,7 +2,7 @@
 
 ## Calibre
 
-Loki电子书转换器's release DMG bundles a background-only Calibre runtime used to perform ebook conversions. Calibre is copyright Kovid Goyal and contributors and is licensed under the GNU General Public License, version 3.
+The macOS release DMG bundles a background-only Calibre runtime used to perform ebook conversions. The Windows installer bundles the official Calibre Windows MSI and runs it as an installation prerequisite. Calibre is copyright Kovid Goyal and contributors and is licensed under the GNU General Public License, version 3.
 
 - Project: https://calibre-ebook.com/
 - Source code: https://github.com/kovidgoyal/calibre

@@ -1,6 +1,6 @@
 # Loki电子书转换器
 
-A small macOS desktop app for converting ebook formats with Calibre's conversion engine.
+A small desktop app for converting ebook formats with Calibre's conversion engine.
 
 ## For users
 
@@ -22,13 +22,21 @@ This approval is for this app only. Do not disable Gatekeeper globally and do no
 
 A public release should eventually be signed and notarized with an Apple Developer account so that users can open it without this one-time approval.
 
+## Windows Installation
+
+The Windows installer is designed to include the official Calibre Windows MSI as a prerequisite. During Loki电子书转换器 setup, Calibre is installed first if it is not already present. After installation, Loki电子书转换器 calls Calibre's `ebook-convert.exe` with the Windows console hidden.
+
+The Windows installer is x64 and requires Windows 10 version 1809 or newer. The current Windows build is unsigned, so Windows SmartScreen may require an explicit confirmation. The first Windows release should be tested on a real Windows machine before publishing.
+
 ## Install With an Agent
 
-Give an Agent this instruction:
+Give an Agent this instruction on macOS:
 
 ```text
 Open the latest release of loki2046-mao/loki-ebook-converter on GitHub. Download the universal DMG, mount it, copy Loki电子书转换器.app to /Applications, and launch it. If macOS blocks the first launch, right-click the app and choose Open, then confirm Open. If that does not work, use System Settings > Privacy & Security > Open Anyway for this app only.
 ```
+
+On Windows, tell the Agent to download the latest `Loki-Ebook-Converter-*-setup.exe` from the same GitHub Release and run the installer. It includes the Calibre prerequisite.
 
 ## Development
 
@@ -66,6 +74,8 @@ The worker is intentionally ignored by Git because it is about 1.1 GB with Calib
 - `preload.js`: isolated renderer bridge
 - `renderer/index.html`: drag-and-drop UI and progress display
 - `scripts/prepare-runtime.js`: prepares the macOS background worker for packaging
+- `scripts/prepare-runtime-win.js`: downloads the official Calibre Windows MSI for the installer
+- `scripts/installer.nsh`: installs the Calibre MSI during Windows setup
 - `runtime/`: generated local build input, excluded from Git
 
 ## Third-party component

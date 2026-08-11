@@ -1,6 +1,6 @@
 {
   "name": "loki-ebook-converter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A clean macOS ebook format converter powered by Calibre", 
   "author": "Loki",
   "license": "MIT",
@@ -13,7 +13,8 @@
     "start": "electron .",
     "prepare:mac": "node scripts/prepare-runtime.js",
     "build:mac": "npm run prepare:mac && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --universal --publish never",
-    "build:win": "electron-builder --win"
+    "prepare:win": "node scripts/prepare-runtime-win.js",
+    "build:win": "npm run prepare:win && electron-builder --win --x64 --publish never"
   },
   "build": {
     "appId": "com.loki.ebookconverter",
@@ -31,7 +32,17 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "include": "installer.nsh"
+    },
+    "directories": {
+      "buildResources": "scripts"
     },
     "files": [
       "main.js",
