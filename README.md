@@ -188,3 +188,9 @@ Loki电子书转换器自有源代码使用 [MIT License](LICENSE)。
 - [Calibre GitHub](https://github.com/kovidgoyal/calibre)
 - [Calibre License](https://calibre-ebook.com/about#license)
 - [第三方组件声明](THIRD_PARTY_NOTICES.md)
+
+## 作者与相关作品
+
+由[赛博小熊猫 Loki](https://hiloki.ai/about)制作与维护。用 AI 做产品、做内容，把真实制作中的修改、取舍和方法留下来。
+
+[个人网站](https://hiloki.ai/) · [作品与制作记录](https://hiloki.ai/works) · [公众号文章](https://hiloki.ai/articles/) · [GitHub](https://github.com/loki2046-mao)
